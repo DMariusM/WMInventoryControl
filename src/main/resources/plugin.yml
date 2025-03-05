@@ -1,0 +1,14 @@
+name: WMInventoryControl
+version: '1.0-SNAPSHOT'
+main: destroier.WMInventoryControl.WMInventoryControl
+api-version: '1.20'
+depend: [WeaponMechanics, NBTAPI]
+commands:
+  checknbt:
+    description: "Shows the NBT data of a WeaponMechanics weapon."
+    usage: "/checknbt"
+    permission: "wm.checknbt"
+  wmic:
+    description: "Reloads the config file for WMInventoryControl."
+    usage: "/wmic reload"
+    permission: "wmic.reload"
