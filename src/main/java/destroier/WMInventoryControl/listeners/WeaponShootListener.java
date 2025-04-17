@@ -33,16 +33,15 @@ public class WeaponShootListener implements Listener {
         }
 
         String weaponTitle = event.getWeaponTitle();
-        EquipmentSlot hand = event.getHand(); // Get the hand being used
+        EquipmentSlot hand = event.getHand(); // Get the hand being used~
 
         // Detect whether the player is shooting from main hand or off-hand
         boolean isMainHand = (hand == EquipmentSlot.HAND);
 
         ItemStack heldItem = isMainHand ? player.getInventory().getItemInMainHand() : player.getInventory().getItemInOffHand();
 
-        // Debug: Print raw weapon title
         if (config.getBoolean("debug-mode")) {
-            plugin.getLogger().info("Weapon shoot event triggered: " + weaponTitle);
+            plugin.getLogger().info("[WMIC] Weapon shoot event triggered: " + weaponTitle);
         }
 
         // Check if weapon is configured
@@ -52,7 +51,7 @@ public class WeaponShootListener implements Listener {
 
         if (heldItem.getAmount() > 1) {
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "(!) You cannot mark stacked items! You need to mark them one at a time.");
+            player.sendMessage("§c(!) You cannot mark stacked items! You need to mark them one at a time.");
             return;
         }
 
@@ -60,7 +59,7 @@ public class WeaponShootListener implements Listener {
         int weaponLimit = configManager.getWeaponLimit(weaponTitle);
 
         if (config.getBoolean("debug-mode")) {
-            plugin.getLogger().info("Player " + player.getName() + " has " + markedWeaponCount + " marked weapons. Limit: " + weaponLimit);
+            plugin.getLogger().info("[WMIC] Player " + player.getName() + " has " + markedWeaponCount + " marked weapons. Limit: " + weaponLimit);
         }
 
         // Check if weapon is marked
@@ -69,11 +68,11 @@ public class WeaponShootListener implements Listener {
             if (markedWeaponCount <= weaponLimit) {
                 inventoryManager.markWeapon(heldItem); // Mark the weapon if within the limit
                 if (config.getBoolean("debug-mode")) {
-                    plugin.getLogger().info("Successfully marked weapon: " + weaponTitle);
+                    plugin.getLogger().info("[WMIC] Successfully marked weapon: " + weaponTitle);
                 }
             } else {
                 event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "(!) You cannot use or mark this weapon as it exceeds the allowed limit.");
+                player.sendMessage("§c(!) You cannot use or mark this weapon as it exceeds the allowed limit.");
             }
         }
     }

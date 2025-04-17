@@ -2,6 +2,7 @@ package destroier.WMInventoryControl.managers;
 
 import destroier.WMInventoryControl.WMInventoryControl;
 import org.bukkit.configuration.file.FileConfiguration;
+
 import java.util.Set;
 
 public class ConfigManager {
@@ -16,7 +17,7 @@ public class ConfigManager {
         String configKey = getConfigKeyForWeapon(weaponName);
         if (configKey == null) {
             if (config.getBoolean("debug-mode")) {
-                plugin.getLogger().info("Weapon not found in config, defaulting to 1: " + weaponName);
+                plugin.getLogger().info("[WMIC] Weapon not found in config, defaulting to 1: " + weaponName);
             }
             return 1; // Default limit if not found
         }
@@ -25,38 +26,43 @@ public class ConfigManager {
 
     public boolean isWeaponConfigured(String weaponTitle) {
         FileConfiguration config = plugin.getConfig();
-        if (config.getConfigurationSection("weapon-limits") == null) {
+
+        var section = config.getConfigurationSection("weapon-limits");
+
+        if (section == null) {
             if (config.getBoolean("debug-mode")) {
-                plugin.getLogger().warning("No 'weapon-limits' section found in config.yml.");
+                plugin.getLogger().warning("[WMIC] No 'weapon-limits' section found in config.yml.");
             }
             return false;
         }
-        Set<String> weaponKeys = config.getConfigurationSection("weapon-limits").getKeys(false);
+
+        Set<String> weaponKeys = section.getKeys(false);
+
         if (config.getBoolean("debug-mode")) {
             plugin.getLogger().info("Loaded weapon keys: " + weaponKeys);
         }
-        for (String key : weaponKeys) {
-            if (key.equalsIgnoreCase(weaponTitle)) {
-                return true;
-            }
-        }
-        return false;
+
+        return weaponKeys.stream().anyMatch(key -> key.equalsIgnoreCase(weaponTitle));
     }
 
     public String getConfigKeyForWeapon(String weaponTitle) {
         FileConfiguration config = plugin.getConfig();
-        if (config.getConfigurationSection("weapon-limits") == null) {
+
+        var section = config.getConfigurationSection("weapon-limits");
+
+        if (section == null) {
             if (config.getBoolean("debug-mode")) {
                 plugin.getLogger().warning("No 'weapon-limits' section found in config.yml.");
             }
             return null;
         }
-        Set<String> weaponKeys = config.getConfigurationSection("weapon-limits").getKeys(false);
-        for (String key : weaponKeys) {
-            if (key.equalsIgnoreCase(weaponTitle)) {
-                return key; // Return the exact config key
-            }
-        }
-        return null;
+
+        // No more warnings here!
+        Set<String> weaponKeys = section.getKeys(false);
+
+        return weaponKeys.stream()
+                .filter(key -> key.equalsIgnoreCase(weaponTitle))
+                .findFirst()
+                .orElse(null);
     }
 }

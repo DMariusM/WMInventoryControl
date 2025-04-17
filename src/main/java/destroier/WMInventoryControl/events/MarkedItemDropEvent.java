@@ -1,7 +1,6 @@
 package destroier.WMInventoryControl.events;
 
 import destroier.WMInventoryControl.WMInventoryControl;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
@@ -28,11 +27,13 @@ public class MarkedItemDropEvent implements Listener {
         }
 
         if (config.getBoolean("debug-mode")) {
-            plugin.getLogger().info("Successfully triggered the drop event!");
+            plugin.getLogger().info("[WMIC] Successfully triggered the drop event!");
         }
 
         if (event.isCancelled()) {
-            plugin.getLogger().info("Drop event was cancelled by another plugin! Skipping unmarking.");
+            if(config.getBoolean("debug-mode")) {
+                plugin.getLogger().info("[WMIC] Drop event was cancelled by another plugin! Skipping unmarking.");
+            }
             return;
         }
 

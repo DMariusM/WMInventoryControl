@@ -36,7 +36,7 @@ public class WeaponComponentsCommand implements CommandExecutor {
         ItemStack heldItem = player.getInventory().getItemInMainHand();
 
         if (config.getBoolean("debug-mode")) {
-            plugin.getLogger().info("CheckNBT command triggered");
+            plugin.getLogger().info("[WMIC] CheckNBT command triggered");
         }
 
         if (!heldItem.hasItemMeta()) {

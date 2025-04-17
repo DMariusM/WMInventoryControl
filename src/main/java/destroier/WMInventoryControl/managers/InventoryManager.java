@@ -16,7 +16,7 @@ public class InventoryManager {
 
     public InventoryManager(WMInventoryControl plugin) {
         this.plugin = plugin;
-        this.weaponMechanics = WeaponMechanics.getInstance(); // FIXED: Proper instance retrieval
+        this.weaponMechanics = WeaponMechanics.getInstance();
     }
 
     /**
@@ -37,7 +37,7 @@ public class InventoryManager {
         item.setItemMeta(meta); // Save changes
 
         if (config.getBoolean("debug-mode")) {
-            plugin.getLogger().info("✅ Successfully marked weapon: " + item.getType());
+            plugin.getLogger().info("[WMIC] Successfully marked weapon: " + item.getType());
         }
     }
 
@@ -51,7 +51,7 @@ public class InventoryManager {
         boolean marked = data.has(new NamespacedKey(plugin, "WM_Marked"), PersistentDataType.BOOLEAN);
 
         if (plugin.getConfig().getBoolean("debug-mode")) {
-            plugin.getLogger().info("🔍 Checking weapon: " + item.getType() + " | Is Marked: " + marked);
+            plugin.getLogger().info("[WMIC] Checking weapon: " + item.getType() + " | Is Marked: " + marked);
         }
 
         return marked;
@@ -64,7 +64,7 @@ public class InventoryManager {
         boolean marked = data.has(new NamespacedKey(plugin, "WM_Inventory_Drop"), PersistentDataType.BOOLEAN);
 
         if (plugin.getConfig().getBoolean("debug-mode")) {
-            plugin.getLogger().info("🔍 Checking weapon: " + item.getType() + " | Is Inventory Marked: " + marked);
+            plugin.getLogger().info("[WMIC] Checking weapon: " + item.getType() + " | Is Inventory Marked: " + marked);
         }
         return marked;
     }
@@ -72,7 +72,6 @@ public class InventoryManager {
     /**
      * Unmarks a weapon by removing the NBT tag.
      */
-    //TODO Needs some work as it does not properly unmark the weapon
     public void unmarkWeapon(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return;
 
@@ -81,9 +80,14 @@ public class InventoryManager {
         PersistentDataContainer data = meta.getPersistentDataContainer();
 
         // Log all existing PDC keys before removal
-        plugin.getLogger().info("Checking PDC tags before unmarking: " + item.getType());
+        if(plugin.getConfig().getBoolean("debug-mode")) {
+            plugin.getLogger().info("[WMIC] Checking PDC tags before unmarking: " + item.getType());
+        }
+
         for (NamespacedKey key : data.getKeys()) {
-            plugin.getLogger().info("    ➜ Found PDC tag: " + key.getKey());
+            if(plugin.getConfig().getBoolean("debug-mode")) {
+                plugin.getLogger().info("    ➜ Found PDC tag: " + key.getKey());
+            }
         }
 
         // Remove custom tags
@@ -109,7 +113,7 @@ public class InventoryManager {
         }
 
         if (plugin.getConfig().getBoolean("debug-mode")) {
-            plugin.getLogger().info("Marked weapons count for " + player.getName() + ": " + count);
+            plugin.getLogger().info("[WMIC] Marked weapons count for " + player.getName() + ": " + count);
         }
 
         return count;

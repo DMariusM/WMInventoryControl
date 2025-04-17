@@ -3,7 +3,6 @@ package destroier.WMInventoryControl.listeners;
 import destroier.WMInventoryControl.WMInventoryControl;
 import destroier.WMInventoryControl.managers.InventoryManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,7 +32,7 @@ public class ContainerUnmarkListener implements Listener {
             InventoryType.BREWING,
             InventoryType.DISPENSER,
             InventoryType.DROPPER,
-            InventoryType.WORKBENCH, // Crafting Table
+            InventoryType.WORKBENCH,
             InventoryType.ENCHANTING,
             InventoryType.ANVIL,
             InventoryType.GRINDSTONE,
@@ -57,7 +56,7 @@ public class ContainerUnmarkListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) {
-            return; // Ignore non-player interactions
+            return;
         }
 
         Inventory clickedInventory = event.getClickedInventory();
@@ -65,34 +64,40 @@ public class ContainerUnmarkListener implements Listener {
         ItemStack currentItem = event.getCurrentItem();
         ItemStack cursorItem = event.getCursor();
 
-        // No inventory clicked or empty item
-        if (clickedInventory == null || (currentItem == null && cursorItem == null)) {
+        if (clickedInventory == null) {
             return;
         }
 
-        // Detects SHIFT-CLICK and places it in the container
+        boolean isCurrentItemEmpty = (currentItem == null || currentItem.getType().isAir());
+        boolean isCursorItemEmpty = cursorItem.getType().isAir(); // Removed redundant null check
+
+        if (isCurrentItemEmpty && isCursorItemEmpty) {
+            return;
+        }
+
+        // Detect SHIFT-CLICK to move to a container
         if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-            if (targetInventory != null && containerTypes.contains(targetInventory.getType())) {
-                if (inventoryManager.isWeaponMarked(currentItem)) {
+            if (containerTypes.contains(targetInventory.getType())) {
+                if (!isCurrentItemEmpty && inventoryManager.isWeaponMarked(currentItem)) {
                     inventoryManager.unmarkWeapon(currentItem);
-                    player.sendMessage(ChatColor.YELLOW + "(!) Your weapon has been unmarked because it was moved into a container.");
+                    player.sendMessage("§e(!) Your weapon has been unmarked because it was moved into a container.");
 
                     if (plugin.getConfig().getBoolean("debug-mode")) {
-                        plugin.getLogger().info("Unmarked weapon moved into: " + targetInventory.getType() + " | Item: " + currentItem.getType());
+                        plugin.getLogger().info("[WMIC] Unmarked weapon moved into: " + targetInventory.getType() + " | Item: " + currentItem.getType());
                     }
                 }
             }
         }
 
-        // Detects CLICK AND DRAG PLACEMENT into a container
+        // Detect CLICK AND DRAG PLACEMENT into a container
         if (event.getClick() == ClickType.LEFT || event.getClick() == ClickType.RIGHT) {
             if (clickedInventory.getType() != InventoryType.PLAYER && containerTypes.contains(clickedInventory.getType())) {
-                if (inventoryManager.isWeaponMarked(cursorItem)) {
+                if (!isCursorItemEmpty && inventoryManager.isWeaponMarked(cursorItem)) {
                     inventoryManager.unmarkWeapon(cursorItem);
-                    player.sendMessage(ChatColor.YELLOW + "(!) Your weapon has been unmarked because it was placed in a container.");
+                    player.sendMessage("§e(!) Your weapon has been unmarked because it was placed in a container.");
 
                     if (plugin.getConfig().getBoolean("debug-mode")) {
-                        plugin.getLogger().info("Unmarked weapon placed into: " + clickedInventory.getType() + " | Item: " + cursorItem.getType());
+                        plugin.getLogger().info("[WMIC] Unmarked weapon placed into: " + clickedInventory.getType() + " | Item: " + cursorItem.getType());
                     }
                 }
             }
@@ -114,21 +119,20 @@ public class ContainerUnmarkListener implements Listener {
         }
 
         InventoryType clickedType = clickedInventory.getType();
-        InventoryType topType = topInventory.getType(); // More accurate than event.getInventory()
+        InventoryType topType = topInventory.getType();
 
-        // ✅ Exclude both normal player inventory and crafting grid
         if (clickedType == InventoryType.PLAYER || topType == InventoryType.PLAYER || topType == InventoryType.CRAFTING) {
             return; // Allow normal inventory interactions
         }
 
-        // ✅ If the inventory is NOT a real container, treat it as a GUI and unmark the weapon
+        // we check if the container is among the list of minecraft containers if not it means it's an Inventory GUI
         if (!isRealContainer(topType)) {
             if (plugin.getInventoryManager().isWeaponMarked(clickedItem)) {
                 plugin.getInventoryManager().unmarkWeapon(clickedItem);
-                player.sendMessage(ChatColor.RED + "(!) You have unmarked a weapon by placing it in a GUI-based inventory!");
+                player.sendMessage("§e(!) You have unmarked a weapon by placing it in a GUI-based inventory!");
 
                 if (plugin.getConfig().getBoolean("debug-mode")) {
-                    plugin.getLogger().info("Player " + player.getName() + " unmarked a marked weapon by placing it in: " + topType + " inventory GUI");
+                    plugin.getLogger().info("[WMIC] Player " + player.getName() + " unmarked a marked weapon by placing it in: " + topType + " inventory GUI");
                 }
             }
         }
@@ -140,29 +144,29 @@ public class ContainerUnmarkListener implements Listener {
             return;
         }
 
-        Inventory topInventory = event.getView().getTopInventory();
+        Inventory topInventory = event.getView().getTopInventory(); // The inventory being interacted with
         int hotbarButton = event.getHotbarButton();
 
-        // Check if this is a hotbar number key swap
+        // check if this is a hotbar number key swap
         if (event.getClick() == ClickType.NUMBER_KEY && hotbarButton >= 0 && hotbarButton <= 8) {
             ItemStack hotbarItem = player.getInventory().getItem(hotbarButton);
             ItemStack inventoryItem = event.getCurrentItem();
 
             if (hotbarItem != null && inventoryManager.isWeaponMarked(hotbarItem)) {
                 // If the item is moved into a non-player container, unmark it
-                if (topInventory != null && topInventory.getHolder() != player) {
+                if (topInventory.getHolder() != player) { // Removed null check
                     inventoryManager.unmarkWeapon(hotbarItem);
-                    player.sendMessage(ChatColor.YELLOW + "(!) Your marked weapon was unmarked after swapping it into a container.");
+                    player.sendMessage("§e(!) Your marked weapon was unmarked after swapping it into a container.");
                     if (plugin.getConfig().getBoolean("debug-mode")) {
-                        plugin.getLogger().info("Unmarked weapon after hotbar swap into a container: " + hotbarItem.getType());
+                        plugin.getLogger().info("[WMIC] Unmarked weapon after hotbar swap into a container: " + hotbarItem.getType());
                     }
                 }
             }
 
-            // Also check if the item being swapped into the hotbar was marked
+            // check if the item being swapped into the hotbar was marked
             if (inventoryItem != null && inventoryManager.isWeaponMarked(inventoryItem)) {
                 if (plugin.getConfig().getBoolean("debug-mode")) {
-                    plugin.getLogger().info("Hotbar swap detected, keeping marking intact for: " + inventoryItem.getType());
+                    plugin.getLogger().info("[WMIC] Hotbar swap detected, keeping marking intact for: " + inventoryItem.getType());
                 }
             }
         }

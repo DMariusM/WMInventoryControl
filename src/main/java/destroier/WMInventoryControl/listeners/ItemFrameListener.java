@@ -2,7 +2,6 @@ package destroier.WMInventoryControl.listeners;
 
 import destroier.WMInventoryControl.WMInventoryControl;
 import destroier.WMInventoryControl.managers.InventoryManager;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.ItemFrame;
@@ -38,17 +37,16 @@ public class ItemFrameListener implements Listener {
         ItemStack heldItem = player.getInventory().getItemInMainHand();
         FileConfiguration config = plugin.getConfig();
 
-        if (heldItem == null || heldItem.getType() == Material.AIR) {
-            return; // No item in hand
+        if (heldItem.getType() == Material.AIR) {
+            return;
         }
 
-        // If the weapon is marked, unmark it when placed in an Item Frame
         if (inventoryManager.isWeaponMarked(heldItem)) {
             inventoryManager.unmarkWeapon(heldItem);
-            player.sendMessage(ChatColor.YELLOW + "(!) Your weapon has been unmarked because it was placed in an Item Frame.");
+            player.sendMessage("§e(!) Your weapon has been unmarked because it was placed in an Item Frame.");
 
             if (config.getBoolean("debug-mode")) {
-                plugin.getLogger().info("Unmarked weapon placed in an Item Frame: " + heldItem.getType());
+                plugin.getLogger().info("[WMIC] Unmarked weapon placed in an Item Frame: " + heldItem.getType());
             }
         }
     }
