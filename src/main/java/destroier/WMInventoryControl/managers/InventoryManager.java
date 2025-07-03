@@ -1,6 +1,6 @@
 package destroier.WMInventoryControl.managers;
 
-import me.deecaad.weaponmechanics.WeaponMechanics;
+import me.deecaad.weaponmechanics.WeaponMechanicsAPI;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -12,11 +12,9 @@ import org.bukkit.persistence.PersistentDataType;
 
 public class InventoryManager {
     private final WMInventoryControl plugin;
-    private final WeaponMechanics weaponMechanics;
 
     public InventoryManager(WMInventoryControl plugin) {
         this.plugin = plugin;
-        this.weaponMechanics = WeaponMechanics.getInstance();
     }
 
     /**
@@ -104,16 +102,21 @@ public class InventoryManager {
     /**
      * Counts the number of marked weapons a player has.
      */
-    public int countMarkedWeapons(Player player) {
+    public int countMarkedWeapons(Player player, String weaponTitle) {
         int count = 0;
         for (ItemStack item : player.getInventory().getContents()) {
             if (isWeaponMarked(item)) {
-                count++;
+                // only count if this marked item’s WeaponMechanics title matches
+                String title = WeaponMechanicsAPI.getWeaponTitle(item);
+                if (title != null && title.equalsIgnoreCase(weaponTitle)) {
+                    count++;
+                }
             }
         }
 
         if (plugin.getConfig().getBoolean("debug-mode")) {
-            plugin.getLogger().info("[WMIC] Marked weapons count for " + player.getName() + ": " + count);
+            plugin.getLogger().info("[WMIC] Marked “" + weaponTitle + "” count for "
+                    + player.getName() + ": " + count);
         }
 
         return count;

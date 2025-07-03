@@ -4,7 +4,6 @@ import destroier.WMInventoryControl.WMInventoryControl;
 import destroier.WMInventoryControl.managers.InventoryManager;
 import destroier.WMInventoryControl.managers.ConfigManager;
 import me.deecaad.weaponmechanics.weapon.weaponevents.WeaponPreShootEvent;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -55,7 +54,7 @@ public class WeaponShootListener implements Listener {
             return;
         }
 
-        int markedWeaponCount = inventoryManager.countMarkedWeapons(player);
+        int markedWeaponCount = inventoryManager.countMarkedWeapons(player, weaponTitle);
         int weaponLimit = configManager.getWeaponLimit(weaponTitle);
 
         if (config.getBoolean("debug-mode")) {
@@ -65,7 +64,7 @@ public class WeaponShootListener implements Listener {
         // Check if weapon is marked
         boolean isMarked = inventoryManager.isWeaponMarked(heldItem);
         if (!isMarked) {
-            if (markedWeaponCount <= weaponLimit) {
+            if (markedWeaponCount < weaponLimit) {
                 inventoryManager.markWeapon(heldItem); // Mark the weapon if within the limit
                 if (config.getBoolean("debug-mode")) {
                     plugin.getLogger().info("[WMIC] Successfully marked weapon: " + weaponTitle);
