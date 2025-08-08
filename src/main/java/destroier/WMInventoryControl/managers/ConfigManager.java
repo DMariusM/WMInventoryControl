@@ -3,6 +3,8 @@ package destroier.WMInventoryControl.managers;
 import destroier.WMInventoryControl.WMInventoryControl;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 public class ConfigManager {
@@ -19,7 +21,7 @@ public class ConfigManager {
             if (config.getBoolean("debug-mode")) {
                 plugin.getLogger().info("[WMIC] Weapon not found in config, defaulting to 1: " + weaponName);
             }
-            return 1; // Default limit if not found
+            return 1; // default limit if not found
         }
         return config.getInt("weapon-limits." + configKey, 1);
     }
@@ -57,12 +59,35 @@ public class ConfigManager {
             return null;
         }
 
-        // No more warnings here!
         Set<String> weaponKeys = section.getKeys(false);
 
         return weaponKeys.stream()
                 .filter(key -> key.equalsIgnoreCase(weaponTitle))
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Returns the list of weapons in the same group as weaponTitle,
+     * or an empty list if weaponTitle is not in any group.
+     */
+    public List<String> getGroupMembers(String weaponTitle) {
+        FileConfiguration config = plugin.getConfig();
+        if (config.getConfigurationSection("groups") == null) {
+            return Collections.emptyList();
+        }
+        Set<String> groupNames = config.getConfigurationSection("groups").getKeys(false);
+        for (String group : groupNames) {
+            List<String> members = config.getStringList("groups." + group);
+            for (String member : members) {
+                if (member.equalsIgnoreCase(weaponTitle)) {
+                    // normalize members to uppercase for consistent comparisons
+                    return members.stream()
+                            .map(String::toUpperCase)
+                            .toList();
+                }
+            }
+        }
+        return Collections.emptyList();
     }
 }

@@ -38,6 +38,7 @@ public final class WMInventoryControl extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ContainerUnmarkListener(this), this);
         getServer().getPluginManager().registerEvents(new ItemFrameListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
+        getServer().getPluginManager().registerEvents(new InvseeTransferListener(this), this);
 
         //commands
         Objects.requireNonNull(this.getCommand("wmic")).setExecutor(new ConfigReloadCommand(this));

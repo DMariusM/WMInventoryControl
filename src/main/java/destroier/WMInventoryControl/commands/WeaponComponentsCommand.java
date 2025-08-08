@@ -78,8 +78,8 @@ public class WeaponComponentsCommand implements CommandExecutor {
         components.put("Weapon Title", CustomTag.WEAPON_TITLE.getString(weaponStack));
         components.put("Ammo Left", CustomTag.AMMO_LEFT.getInteger(weaponStack));
         components.put("Fire Mode", CustomTag.SELECTIVE_FIRE.getInteger(weaponStack));
-        components.put("Durability", CustomTag.DURABILITY.getInteger(weaponStack));
-        components.put("Max Durability", CustomTag.MAX_DURABILITY.getInteger(weaponStack));
+//        components.put("Durability", CustomTag.DURABILITY.getInteger(weaponStack));
+//        components.put("Max Durability", CustomTag.MAX_DURABILITY.getInteger(weaponStack));
         components.put("Current Skin", CustomTag.WEAPON_SKIN.getString(weaponStack));
         components.put("Magazine Size", CustomTag.AMMO_MAGAZINE.getInteger(weaponStack));
 

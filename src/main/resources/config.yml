@@ -4,3 +4,7 @@ debug-mode: true
 weapon-limits:
   AUG: 2
   AK_47: 1
+#weapon groups
+groups:
+  weapon_group_name1: [AK_47, AUG]
+  weapon_group_name2: [Revolver, Glock]

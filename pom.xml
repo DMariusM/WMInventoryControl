@@ -44,31 +44,31 @@
             </plugin>
 
             <!-- Plugin to copy the built JAR to the Minecraft plugins folder -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>C:\Users\Sephiroth\Desktop\Minecraft 1.20.6\plugins</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>${project.build.finalName}.jar</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.apache.maven.plugins</groupId>-->
+            <!--                <artifactId>maven-resources-plugin</artifactId>-->
+            <!--                <version>3.2.0</version>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <id>copy-jar</id>-->
+            <!--                        <phase>package</phase>-->
+            <!--                        <goals>-->
+            <!--                            <goal>copy-resources</goal>-->
+            <!--                        </goals>-->
+            <!--                        <configuration>-->
+            <!--                            <outputDirectory>C:\Users\Sephiroth\Desktop\Minecraft 1.20.6\plugins</outputDirectory>-->
+            <!--                            <resources>-->
+            <!--                                <resource>-->
+            <!--                                    <directory>${project.build.directory}</directory>-->
+            <!--                                    <includes>-->
+            <!--                                        <include>${project.build.finalName}.jar</include>-->
+            <!--                                    </includes>-->
+            <!--                                </resource>-->
+            <!--                            </resources>-->
+            <!--                        </configuration>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--            </plugin>-->
         </plugins>
 
         <resources>
@@ -103,8 +103,8 @@
 
         <dependency>
             <groupId>com.cjcrafter</groupId>
-            <artifactId>weaponmechanics</artifactId>
-            <version>3.4.1</version>
+            <artifactId>mechanicscore</artifactId>
+            <version>4.1.2</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -112,6 +112,13 @@
                     <artifactId>SpigotUpdateChecker</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.cjcrafter</groupId>
+            <artifactId>weaponmechanics</artifactId>
+            <version>4.1.2</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

@@ -33,6 +33,8 @@ public class ContainerUnmarkListener implements Listener {
             InventoryType.DISPENSER,
             InventoryType.DROPPER,
             InventoryType.WORKBENCH,
+            InventoryType.HOPPER,
+            InventoryType.CRAFTING,
             InventoryType.ENCHANTING,
             InventoryType.ANVIL,
             InventoryType.GRINDSTONE,
@@ -40,7 +42,8 @@ public class ContainerUnmarkListener implements Listener {
             InventoryType.LOOM,
             InventoryType.SMITHING,
             InventoryType.STONECUTTER,
-            InventoryType.SHULKER_BOX
+            InventoryType.SHULKER_BOX,
+            InventoryType.DECORATED_POT
     );
 
     public boolean isRealContainer(InventoryType type) {

@@ -11,6 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 public class WeaponShootListener implements Listener {
 
     private final WMInventoryControl plugin;
@@ -46,6 +48,22 @@ public class WeaponShootListener implements Listener {
         // Check if weapon is configured
         if (!configManager.isWeaponConfigured(weaponTitle)) {
             return;
+        }
+
+        List<String> groupMembers = configManager.getGroupMembers(weaponTitle);
+        if (!groupMembers.isEmpty()) {
+            // remove this weapon from the list
+            for (String other : groupMembers) {
+                if (other.equalsIgnoreCase(weaponTitle)) continue;
+                int otherCount = inventoryManager.countMarkedWeapons(player, other);
+                if (otherCount > 0) {
+                    event.setCancelled(true);
+                    player.sendMessage("§c(!) You cannot mark "
+                            + weaponTitle + " because you already have a "
+                            + other + " marked in the same group.");
+                    return;
+                }
+            }
         }
 
         if (heldItem.getAmount() > 1) {
