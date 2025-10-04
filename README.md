@@ -360,3 +360,6 @@ If you open an issue, please include:
 - Paper, WMIC, WeaponMechanics, and (if used) CombatLogX versions
 - Your relevant config sections (weapon-limits, groups, weight-groups, containers)
 - What you did, what you expected, and what happened (plus any WMIC debug logs if you toggled them)
+
+Copyright © 2024–2025 DestroierMariusM (DMariusM).
+Licensed under GPL-3.0-or-later. See [LICENSE](https://github.com/DMariusM/WMInventoryControl/blob/master/LICENSE).
