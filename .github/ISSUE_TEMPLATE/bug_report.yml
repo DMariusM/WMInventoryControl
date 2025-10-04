@@ -1,6 +1,8 @@
 name: "Bug report"
 description: "Something doesn’t work in WMInventoryControl"
 labels: ["bug", "needs-triage"]
+assignees:
+  - DMariusM
 body:
   - type: checkboxes
     id: preflight
