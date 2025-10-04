@@ -5,11 +5,19 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import destroier.WMInventoryControl.WMInventoryControl;
-import org.bukkit.configuration.file.FileConfiguration;
+import destroier.WMInventoryControl.debug.Debug;
+import destroier.WMInventoryControl.debug.Debug.DebugKey;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+/**
+ * Handles marking/unmarking of items using PersistentDataContainer (PDC).
+ * Features:
+ * - Mark/Unmark helpers for WM items (adds/removes custom PDC flags).
+ * - Queries to detect "marked" or "inventory-drop-marked" items.
+ * - Utility to count marked weapons by WeaponMechanics title in a player's inv.
+ */
 public class InventoryManager {
     private final WMInventoryControl plugin;
 
@@ -23,7 +31,6 @@ public class InventoryManager {
     public void markWeapon(ItemStack item) {
         if (item == null) return;
 
-        FileConfiguration config = plugin.getConfig();
         ItemMeta meta = item.getItemMeta();
 
         if (meta == null) return;
@@ -34,9 +41,7 @@ public class InventoryManager {
 
         item.setItemMeta(meta); // Save changes
 
-        if (config.getBoolean("debug-mode")) {
-            plugin.getLogger().info("[WMIC] Successfully marked weapon: " + item.getType());
-        }
+        Debug.log(plugin, DebugKey.INVENTORY_MANAGER, "Successfully marked weapon: " + item.getType());
     }
 
     /**
@@ -48,9 +53,8 @@ public class InventoryManager {
         PersistentDataContainer data = item.getItemMeta().getPersistentDataContainer();
         boolean marked = data.has(new NamespacedKey(plugin, "WM_Marked"), PersistentDataType.BOOLEAN);
 
-        if (plugin.getConfig().getBoolean("debug-mode")) {
-            plugin.getLogger().info("[WMIC] Checking weapon: " + item.getType() + " | Is Marked: " + marked);
-        }
+        Debug.log(plugin, DebugKey.INVENTORY_MANAGER,
+                "Checking weapon: " + item.getType() + " | Is Marked: " + marked);
 
         return marked;
     }
@@ -61,9 +65,9 @@ public class InventoryManager {
         PersistentDataContainer data = item.getItemMeta().getPersistentDataContainer();
         boolean marked = data.has(new NamespacedKey(plugin, "WM_Inventory_Drop"), PersistentDataType.BOOLEAN);
 
-        if (plugin.getConfig().getBoolean("debug-mode")) {
-            plugin.getLogger().info("[WMIC] Checking weapon: " + item.getType() + " | Is Inventory Marked: " + marked);
-        }
+        Debug.log(plugin, DebugKey.INVENTORY_MANAGER,
+                "Checking weapon: " + item.getType() + " | Is Inventory Marked: " + marked);
+
         return marked;
     }
 
@@ -73,19 +77,15 @@ public class InventoryManager {
     public void unmarkWeapon(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return;
 
-        FileConfiguration config = plugin.getConfig();
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer data = meta.getPersistentDataContainer();
 
         // Log all existing PDC keys before removal
-        if(plugin.getConfig().getBoolean("debug-mode")) {
-            plugin.getLogger().info("[WMIC] Checking PDC tags before unmarking: " + item.getType());
-        }
+        Debug.log(plugin, DebugKey.INVENTORY_MANAGER,
+                "Checking PDC tags before unmarking: " + item.getType());
 
         for (NamespacedKey key : data.getKeys()) {
-            if(plugin.getConfig().getBoolean("debug-mode")) {
-                plugin.getLogger().info("    ➜ Found PDC tag: " + key.getKey());
-            }
+            Debug.log(plugin, DebugKey.INVENTORY_MANAGER, "    -> Found PDC tag: " + key.getKey());
         }
 
         // Remove custom tags
@@ -94,9 +94,7 @@ public class InventoryManager {
 
         item.setItemMeta(meta); // Save changes
 
-        if (config.getBoolean("debug-mode")) {
-            plugin.getLogger().info("Unmarked weapon: " + item.getType());
-        }
+        Debug.log(plugin, DebugKey.INVENTORY_MANAGER, "Unmarked weapon: " + item.getType());
     }
 
     /**
@@ -104,20 +102,19 @@ public class InventoryManager {
      */
     public int countMarkedWeapons(Player player, String weaponTitle) {
         int count = 0;
+
         for (ItemStack item : player.getInventory().getContents()) {
-            if (isWeaponMarked(item)) {
-                // only count if this marked item’s WeaponMechanics title matches
-                String title = WeaponMechanicsAPI.getWeaponTitle(item);
-                if (title != null && title.equalsIgnoreCase(weaponTitle)) {
-                    count++;
-                }
+            if (item == null || item.getType().isAir()) continue;      // guard
+            if (!isWeaponMarked(item)) continue; // cheap fast-path
+
+            String title = WeaponMechanicsAPI.getWeaponTitle(item); // may be null for non-WM items
+            if (title != null && title.equalsIgnoreCase(weaponTitle)) {
+                count++;
             }
         }
 
-        if (plugin.getConfig().getBoolean("debug-mode")) {
-            plugin.getLogger().info("[WMIC] Marked “" + weaponTitle + "” count for "
-                    + player.getName() + ": " + count);
-        }
+        Debug.log(plugin, DebugKey.INVENTORY_MANAGER,
+                "Marked \"" + weaponTitle + "\" count for " + player.getName() + ": " + count);
 
         return count;
     }

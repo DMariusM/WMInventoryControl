@@ -1,10 +1,137 @@
-#debug mode
-debug-mode: true
-#weapon limits
+# per-listener debug toggles (ALL default to false)
+debug-mode:
+  weapon-shoot:        false
+  container-unmark:    false   # unmark after moving into real containers
+  container-block:     false   # log when we cancel non-accepting placements
+  invsee-transfer:     false   # /invsee give/take logic
+  player-drop:         false
+  item-frame:          false
+  player-death:        false
+  special-container:   false   # e.g., Decorated Pot 1-tick checks
+  hat-guard:           false
+  auction:             false
+  groups:              false
+  combat:              false
+  combat-end:          false
+  config-manager:      false
+  inventory-manager:   false
+  weight:              false
+  config-reload:       false
+
+# containers where marked weapons get unmarked after getting placed inside them
+containers:
+
+  # REGULAR CONTAINERS — real storage that accepts arbitrary items.
+  # We allow placement and UNMARK once the item actually goes in.
+  # Notes:
+  # - ENDER_CHEST: persistent storage per player. Still considered a real container.
+  # - SHULKER_BOX: allows putting items inside.
+  # - DECORATED_POT: commented out (UI quirks); handle via a special listener if needed.
+  # - PLAYER/CRAFTING/CREATIVE are NOT containers.
+  regular:
+    - CHEST
+    - BARREL
+    - ENDER_CHEST
+    - SHULKER_BOX
+    - HOPPER
+    - DISPENSER
+    - DROPPER
+    - BLAST_FURNACE
+    - SMOKER
+    # - DECORATED_POT   # Optional: keep commented; handled elsewhere due to 1-tick quirks
+
+  # NON-ACCEPTING CONTAINERS — utility/recipe UIs that reject most items (like feathers).
+  # We CANCEL any attempt to place a MARKED weapon here and DO NOT unmark.
+  # This avoids the "unmarked but bounced back" problem.
+  # Notes:
+  # - WORKBENCH: classic crafting table. You usually don't allow marked weapons in recipes
+  #   anyway; add it here if you want to hard-cancel attempts.
+  # - JUKEBOX: accepts only discs; add here if you want to hard-cancel attempts for weapons.
+  non-accepting:
+    - BEACON
+    - ENCHANTING
+    - ANVIL
+    - GRINDSTONE
+    - CARTOGRAPHY
+    - LOOM
+    - SMITHING
+    - STONECUTTER
+    - MERCHANT
+    - BREWING
+    - FURNACE
+    # - WORKBENCH
+    # - JUKEBOX
+
+# auction commands
+auction-commands:
+  - ah
+  - auction
+  - auc
+  - auchand
+
+# Per-weapon hard caps (by WeaponMechanics weapon title)
 weapon-limits:
   AUG: 2
   AK_47: 1
-#weapon groups
+  M4A1: 1
+
+# weapon groups
 groups:
-  weapon_group_name1: [AK_47, AUG]
-  weapon_group_name2: [Revolver, Glock]
+  # one of the 2
+  Primary_Exclusive:
+    type: EXCLUSIVE
+    items:
+      - AK_47
+      - M4A1
+
+  # limit is 3, but you are the one who dictates how much each member gets from that limit
+  Pistols:
+    type: POOL
+    limit: 3 # total amount per
+    members:
+      - Glock: 1
+      - Revolver: 2
+
+# combat-time interaction rules (requires CombatLogX).
+combat-restrictions:
+  # prevent firing from auto-marking while tagged in combat
+  block-marking-in-combat: false
+
+  # if a player unmarks a title during combat, block re-marking that specific title
+  # until they are untagged (anti swap/abuse). Recommended: true
+  block-re-marking-in-combat: true
+
+  # block dropping marked weapons while in combat (includes “click outside”)
+  block-dropping-in-combat: true
+
+  # block moving marked weapons into containers/GUI while in combat
+  block-moving-marked-in-combat: true
+
+# weight system (CombatLogX only) — active while tagged in combat
+weight-groups:
+  Individual_Explosives:
+    type: INDIVIDUAL
+    maximum_limit: 80
+    items:
+      GRENADE:   10
+      FLASHBANG: 15
+      MOLOTOV:   25
+
+  Collective_Group_Explosives:
+    type: SHARED_POOL
+    maximum_limit: 5
+    items:
+      GRENADE:   2
+      MOLOTOV:   2
+      FLASHBANG: 3
+
+# when combat ends, clear per-combat weights
+# true  -> weights reset immediately on untag (timeout is ignored)
+# false -> weights persist; see weight-reset-timeout-seconds below
+remove-limit-post-combat: true
+
+# Optional timeout reset while out of combat.
+# If > 0 AND remove-limit-post-combat is FALSE, WMIC clears the weight
+# after the player has been OUT OF COMBAT for this many seconds.
+# Set to 0 to disable the timeout.
+weight-reset-timeout-seconds: 0
