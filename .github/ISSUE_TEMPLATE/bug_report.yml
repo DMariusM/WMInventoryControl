@@ -1,0 +1,57 @@
+name: "Bug report"
+description: "Something doesn’t work in WMInventoryControl"
+labels: ["bug", "needs-triage"]
+body:
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched existing issues
+          required: true
+        - label: I’m on the latest WMInventoryControl release
+          required: true
+  - type: input
+    id: wmic-version
+    attributes: { label: WMInventoryControl version, placeholder: "e.g., 1.0.0" }
+    validations: { required: true }
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Paper/Java/WeaponMechanics/CombatLogX/BlueSlimeCore versions.
+      placeholder: |
+        Paper: 1.21.x build ###
+        Java: 21
+        WeaponMechanics: 4.1.5
+        CombatLogX (if used): 11.x
+        BlueSlimeCore (if used): 2.9.x
+    validations: { required: true }
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant config
+      render: yaml
+      description: weapon-limits, groups, containers, weight-groups, combat-restrictions.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1) …
+        2) …
+        3) …
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes: { label: Expected behavior }
+    validations: { required: true }
+  - type: textarea
+    id: actual
+    attributes: { label: Actual behavior }
+    validations: { required: true }
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context / screenshots / logs
+      description: Enable specific keys under `debug-mode.*` if helpful.
