@@ -1,0 +1,31 @@
+name: "Feature request"
+description: "Suggest an enhancement or new option"
+labels: ["feature", "needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes: { label: Problem to solve }
+    validations: { required: true }
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Include the UX/config surface (new keys & defaults) and behavior.
+      placeholder: |
+        - New key: combat-restrictions.block-foo: true
+        - Default: false
+        - Behavior: …
+    validations: { required: true }
+  - type: textarea
+    id: alternatives
+    attributes: { label: Alternatives considered }
+  - type: checkboxes
+    id: compat
+    attributes:
+      label: Backwards compatibility
+      options:
+        - label: Works with existing configs (no breaking changes)
+        - label: Requires a major version bump
+  - type: textarea
+    id: context
+    attributes: { label: Additional context }
